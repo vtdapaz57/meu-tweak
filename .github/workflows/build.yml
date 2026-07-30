@@ -13,36 +13,31 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
-          echo "TARGET=iphone:clang:14.5:12.0" >> $GITHUB_ENV
 
-      - name: Install ldid
+      - name: Show files
         run: |
-          git clone https://github.com/ProcursusTeam/ldid.git
-          cd ldid
-          git submodule update --init
-          make
-          sudo make install
+          ls -la
+          cat Makefile
+          head -20 Tweak.xm
 
-      - name: Compile Tweak
-        id: compile
-        continue-on-error: true
+      - name: Compile with full output
         run: |
           export THEOS=$HOME/theos
           export TARGET=iphone:clang:14.5:12.0
-          make 2>&1 | tee build.log
-          if [ ${PIPESTATUS[0]} -ne 0 ]; then
-            echo "COMPILE_FAILED=true" >> $GITHUB_ENV
-          fi
+          export SDKVERSION=14.5
+          make clean
+          make 2>&1 | tee /tmp/build.log
+          exit ${PIPESTATUS[0]}
 
-      - name: Show build log if failed
-        if: env.COMPILE_FAILED == 'true'
-        run: |
-          echo "===== BUILD LOG ====="
-          cat build.log
-          echo "===================="
+      - name: Upload error log if failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error_log
+          path: /tmp/build.log
 
       - name: Upload dylib if success
-        if: env.COMPILE_FAILED != 'true'
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: tweak_output
