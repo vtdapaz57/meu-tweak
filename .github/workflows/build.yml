@@ -8,11 +8,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Theos
-        uses: Randomblock1/theos-action@v1
+      - name: Install Theos (manual)
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          echo "$HOME/theos/bin" >> $GITHUB_PATH
+
+      - name: Install ldid (assinatura)
+        run: |
+          git clone https://github.com/ProcursusTeam/ldid.git
+          cd ldid
+          git submodule update --init
+          make
+          sudo make install
 
       - name: Compile Tweak
-        run: make
+        run: |
+          export THEOS=$HOME/theos
+          export TARGET=iphone:clang:14.5:12.0
+          make
 
       - name: Upload dylib
         uses: actions/upload-artifact@v4
