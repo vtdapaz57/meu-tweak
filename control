@@ -1,0 +1,8 @@
+Package: com.omega.urielpanel
+Name: Uriel Stream Panel
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Painel visual estilo Uriel (simulação acadêmica).
+Maintainer: SeuNome
+Author: SeuNome
+Section: Tweaks
