@@ -1,0 +1,21 @@
+name: Build Tweak
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Theos
+        uses: Randomblock1/theos-action@v1
+
+      - name: Compile Tweak
+        run: make
+
+      - name: Upload dylib
+        uses: actions/upload-artifact@v3
+        with:
+          name: tweak_output
+          path: ./*.dylib
